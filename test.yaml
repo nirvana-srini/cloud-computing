@@ -1,0 +1,23 @@
+class:
+  # declare a variable
+  id: &empId !!str 121E
+  name: "Srini"
+  salary: 10000
+  address:
+    - home:
+        # uses the variable
+        id: *empId
+        street: "Kondapur"
+        city: "Hyderabad"
+    - office:
+        street: "Kondapur"
+        city: "Hyderabad"
+description: >
+  Folded block
+  This is a multiline statement would be printed in two lines,
+  like this is not a new line. This is in the same line.
+
+longDescription: |
+  Unfolded as it is..
+  This is not a multiline statement would be printed in two lines,
+  like this is a new line. This is in the same line.

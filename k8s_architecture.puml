@@ -1,0 +1,26 @@
+@startuml
+frame "k8s-local-cluster" {
+agent "kubectl"
+
+frame "Control Plane Node"{
+    Component "APIServer"
+    Database "etcd"
+    rectangle "scheduler"
+    rectangle "Kube Controller"
+    "APIServer" -- "etcd"
+}
+kubectl -- "Control Plane Node"
+frame "DataPlane" {
+    node "Worker Node 1"
+    node "Worker 2"
+    node "Worker 3"
+    node "Worker 4"
+}
+
+"Control Plane Node" -- "Worker Node 1"
+"Control Plane Node" -- "Worker 2"
+"Control Plane Node" -- "Worker 3"
+"Control Plane Node" -- "Worker 4"
+}
+
+@enduml
