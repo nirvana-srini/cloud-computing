@@ -188,14 +188,26 @@ $ minikube dashboard --url -p k8s-local-cluster
 🤔  Verifying proxy health ...
 http://127.0.0.1:58416/api/v1/namespaces/kubernetes-dashboard/services/http:kubernetes-dashboard:/proxy/
 ```
+### Delete a Node from Cluster using Minikube command
 
+```
+$ minikube node delete k8s-local-cluster-m03 -p k8s-local-cluster
+
+🔥  Deleting node k8s-local-cluster-m03 from cluster k8s-local-cluster
+✋  Stopping node "k8s-local-cluster-m03"  ...
+🛑  Powering off "k8s-local-cluster-m03" via SSH ...
+🔥  Deleting "k8s-local-cluster-m03" in docker ...
+
+```
 # POD
 What is a POD?
 POD is shell/case around the group of things. like Pea seeds.
 Pod is an encapsulated layer for of group or single container/s.
 Smallest deployable units of computation in the Kubernetes cluster. Runs on Worker nodes.
 Created and Managed by the kubelet.
-Pod is identified with dedicated IP Address and a port number on its network.
+Pod is identified with dedicated unique IP Address and range of ports on its network.
+With in the POD containers shares same network and communicate with localhost.
+Containers belonging to different PODs use the IP Address to communicate with.
 
 Pods are the smallest deployable units of computing that you can create and manage in Kubernetes.
 
@@ -210,3 +222,362 @@ You can also inject ephemeral containers for debugging a running Pod.
 Use cases:
  - One Container per Pod.
  - Multiple Container per Pod.
+
+Multi Container POD
+Helper Container
+Main Container
+
+### Sidecar Containers
+Sidecar containers are the secondary containers that run along with the main application container within the same Pod. 
+These containers are used to enhance or to extend the functionality of the main application container by providing additional services, 
+or functionality such as logging, monitoring, security, or data synchronization, without directly altering the primary application code.
+
+### Create a POD
+ Use kubectl run command
+ 
+```jshelllanguage
+$ kubectl run nginx-pod --image=ngnix
+pod/nginx-pod created
+
+$ kubectl get pods
+NAME        READY   STATUS             RESTARTS   AGE
+nginx-pod   0/1     ImagePullBackOff   0          56s
+
+$kubectl 
+```
+##### All the resources and their kind, api version ansd short name details.
+> [Note]- Click Here 
+```jshelllanguage
+$ kubectl api-resources
+NAME                              SHORTNAMES   APIVERSION                             NAMESPACED   KIND
+bindings                                       v1                                     true         Binding
+componentstatuses                 cs           v1                                     false        ComponentStatus
+configmaps                        cm           v1                                     true         ConfigMap
+endpoints                         ep           v1                                     true         Endpoints
+events                            ev           v1                                     true         Event
+limitranges                       limits       v1                                     true         LimitRange
+namespaces                        ns           v1                                     false        Namespace
+nodes                             no           v1                                     false        Node
+persistentvolumeclaims            pvc          v1                                     true         PersistentVolumeClaim
+persistentvolumes                 pv           v1                                     false        PersistentVolume
+pods                              po           v1                                     true         Pod
+podtemplates                                   v1                                     true         PodTemplate
+replicationcontrollers            rc           v1                                     true         ReplicationController
+resourcequotas                    quota        v1                                     true         ResourceQuota
+secrets                                        v1                                     true         Secret
+serviceaccounts                   sa           v1                                     true         ServiceAccount
+services                          svc          v1                                     true         Service
+mutatingwebhookconfigurations                  admissionregistration.k8s.io/v1        false        MutatingWebhookConfiguration
+validatingwebhookconfigurations                admissionregistration.k8s.io/v1        false        ValidatingWebhookConfiguration
+customresourcedefinitions         crd,crds     apiextensions.k8s.io/v1                false        CustomResourceDefinition
+apiservices                                    apiregistration.k8s.io/v1              false        APIService
+controllerrevisions                            apps/v1                                true         ControllerRevision
+daemonsets                        ds           apps/v1                                true         DaemonSet
+deployments                       deploy       apps/v1                                true         Deployment
+replicasets                       rs           apps/v1                                true         ReplicaSet
+statefulsets                      sts          apps/v1                                true         StatefulSet
+tokenreviews                                   authentication.k8s.io/v1               false        TokenReview
+localsubjectaccessreviews                      authorization.k8s.io/v1                true         LocalSubjectAccessReview
+selfsubjectaccessreviews                       authorization.k8s.io/v1                false        SelfSubjectAccessReview
+selfsubjectrulesreviews                        authorization.k8s.io/v1                false        SelfSubjectRulesReview
+subjectaccessreviews                           authorization.k8s.io/v1                false        SubjectAccessReview
+horizontalpodautoscalers          hpa          autoscaling/v2                         true         HorizontalPodAutoscaler
+cronjobs                          cj           batch/v1                               true         CronJob
+jobs                                           batch/v1                               true         Job
+certificatesigningrequests        csr          certificates.k8s.io/v1                 false        CertificateSigningRequest
+leases                                         coordination.k8s.io/v1                 true         Lease
+endpointslices                                 discovery.k8s.io/v1                    true         EndpointSlice
+events                            ev           events.k8s.io/v1                       true         Event
+flowschemas                                    flowcontrol.apiserver.k8s.io/v1beta3   false        FlowSchema
+prioritylevelconfigurations                    flowcontrol.apiserver.k8s.io/v1beta3   false        PriorityLevelConfiguration
+ingressclasses                                 networking.k8s.io/v1                   false        IngressClass
+ingresses                         ing          networking.k8s.io/v1                   true         Ingress
+networkpolicies                   netpol       networking.k8s.io/v1                   true         NetworkPolicy
+runtimeclasses                                 node.k8s.io/v1                         false        RuntimeClass
+poddisruptionbudgets              pdb          policy/v1                              true         PodDisruptionBudget
+clusterrolebindings                            rbac.authorization.k8s.io/v1           false        ClusterRoleBinding
+clusterroles                                   rbac.authorization.k8s.io/v1           false        ClusterRole
+rolebindings                                   rbac.authorization.k8s.io/v1           true         RoleBinding
+roles                                          rbac.authorization.k8s.io/v1           true         Role
+priorityclasses                   pc           scheduling.k8s.io/v1                   false        PriorityClass
+csidrivers                                     storage.k8s.io/v1                      false        CSIDriver
+csinodes                                       storage.k8s.io/v1                      false        CSINode
+csistoragecapacities                           storage.k8s.io/v1                      true         CSIStorageCapacity
+storageclasses                    sc           storage.k8s.io/v1                      false        StorageClass
+volumeattachments                              storage.k8s.io/v1                      false        VolumeAttachment
+```
+
+#### Create POD using yaml file config
+Create a Pod and get pod filter by labels.
+
+```jshelllanguage
+$ kubectl apply -f nginx-pod.yaml
+
+$ kubectl get pods -l env=dev
+NAME          READY   STATUS    RESTARTS   AGE
+nginx-pod-1   1/1     Running   0          6m44s
+```
+NAME - Name of the POD
+READY 1/1 mean 1 container is running out of 1 defined.
+RESTARTS - As of now pod is not restarted at least once so 0.
+AGE - Aging of pod.
+IP - Network IP Address of the Pod. 
+Node - Worker node in which it is running.
+
+##### Details of the POD
+```jshelllanguage
+$ kubectl get pod nginx-pod-1 -o wide
+NAME          READY   STATUS    RESTARTS   AGE   IP           NODE                    NOMINATED NODE   READINESS GATES
+nginx-pod-1   1/1     Running   0          10m   10.244.2.4   k8s-local-cluster-m03   <none>           <none>
+
+$ kubectl get pod nginx-pod-1 -o yaml
+$ kubectl describe pod nginx-pod-1
+```
+-o Flag indicates the format in wide or yaml (yml does not work - tested)
+
+# Pod & Container Bash in Interactive Mode 
+Enter into bash shell of the Pod using the below command.
+```jshelllanguage
+$ kubectl exec -it nginx-pod-1 -- bash
+$kubectl exec -it nginx-pod-1 -c nginx-deployment -- bash
+```
+
+# Access POD 
+How to access POD.
+We can not directly access POD from outside of the node other wise from the host/cluster that it is running by doing port forwarding.
+
+## Port forwarding
+Post forwarding using kubectl.
+
+```jshelllanguage
+$ kubectl port-forward nginx-pod-1 8083:80
+Forwarding from 127.0.0.1:8083 -> 80
+Forwarding from [::1]:8083 -> 80
+Handling connection for 8083
+Handling connection for 8083
+
+$kubectl logs nginx-pod-1
+```
+
+## Replicaset Intro [High Availability]
+
+- **High Availability**: Application should  be available to client all the times, should be fault tolerant, 
+in case of any POD/Node/Container/Cluster crashes k8s handles ir through replicas.
+
+- **Self Healing**:
+Bring up the PODs automatically. DESIRED state and CURRENT no of POD running should match. 
+If a pod is corrupted and killed due to any reasons it should be recreated automatically.
+
+- **_Rollout and Rollback:_**
+
+Create ReplicaSet using yaml file configuration
+
+```jshelllanguage
+$ kubectl apply -f nginx-replicas.yaml
+replicaset.apps/nginx-replica-set created
+
+$ kubectl get pods
+NAME                      READY   STATUS              RESTARTS   AGE
+nginx-replica-set-cvhht   0/1     ContainerCreating   0          10s
+nginx-replica-set-pskwg   1/1     Running             0          10s
+nginx-replica-set-pvvwc   0/1     ContainerCreating   0          10s
+
+$ kubectl get rs
+NAME                DESIRED   CURRENT   READY   AGE
+nginx-replica-set   3         3         3       71s
+
+$ kubectl get pods
+NAME                      READY   STATUS    RESTARTS   AGE
+nginx-replica-set-cvhht   1/1     Running   0          77s
+nginx-replica-set-pskwg   1/1     Running   0          77s
+nginx-replica-set-pvvwc   1/1     Running   0          77s
+
+```
+
+### Synthesis of Self healing steps:
+Simulate the Self healing Scenario Step by step with different use cases
+#### Delete a Node 
+- Before deleting a node add extra node as we have only one worker node now
+- ```$ minikube node add --worker -p k8s-local-cluster```
+- ```$ minikube node delete k8s-local-cluster-m03 -p k8s-local-cluster```
+- ```kubectl get nodes```
+- ```kubectl get po -o wide```
+- 
+ #### Delete a Pod
+
+### Delete All Pods
+
+```jshelllanguage
+$ kubectl delete pods --all -A
+pod "nginx-replica-set-pvvwc" deleted
+pod "nginx-replica-set-sgtbv" deleted
+pod "nginx-replica-set-w9tvz" deleted
+pod "coredns-5d78c9869d-2bqjk" deleted
+pod "etcd-k8s-local-cluster" deleted
+pod "kindnet-d8272" deleted
+pod "kindnet-jsv6c" deleted
+pod "kube-apiserver-k8s-local-cluster" deleted
+pod "kube-controller-manager-k8s-local-cluster" deleted
+pod "kube-proxy-pcfk6" deleted
+pod "kube-proxy-qpt4r" deleted
+pod "kube-scheduler-k8s-local-cluster" deleted
+pod "storage-provisioner" deleted
+pod "dashboard-metrics-scraper-5dd9cbfd69-98b2g" deleted
+pod "kubernetes-dashboard-5c5cfc8747-rhvrb" deleted
+```
+
+Error Scenario:
+
+```plantuml
+$ kubectl apply -f nginx-deployment.yaml 
+The Deployment "nginx-deployment" is invalid: 
+* spec.template.metadata.labels: Invalid value: map[string]string{"env":"dev", "team":"backend", "version":"test"}: `selector` does not match template `labels`
+* spec.selector: Invalid value: v1.LabelSelector{MatchLabels:map[string]string{"env":"dev3", "team":"backend3"}, MatchExpressions:[]v1.LabelSelectorRequirement(nil)}: field is immutable
+```
+
+
+## Deployment  -- Desired State
+A Deployment provides declarative updates for Pods and ReplicaSets.
+
+You describe a desired state in a Deployment, and the Deployment Controller changes the actual state to the desired state at a controlled rate. 
+You can define Deployments to create new ReplicaSets, or to remove existing Deployments and adopt all their resources with new Deployments.
+
+### Deployment Resource creation
+This is used to get extra benefits like rollout and rollback
+
+```
+Srinivass-MacBook-Pro:deployments $ kubectl apply -f nginx-deployment.yaml 
+deployment.apps/nginx-deployment created
+Srinivass-MacBook-Pro:deployments $ kubectl get nodes
+NAME                    STATUS   ROLES           AGE   VERSION
+k8s-local-cluster       Ready    control-plane   9h    v1.27.4
+k8s-local-cluster-m02   Ready    <none>          58m   v1.27.4
+Srinivass-MacBook-Pro:deployments $ kubectl get pods
+NAME                                READY   STATUS    RESTARTS   AGE
+nginx-deployment-844c4b59f9-5xh2h   1/1     Running   0          14s
+nginx-deployment-844c4b59f9-ltkpg   1/1     Running   0          14s
+nginx-deployment-844c4b59f9-n9xf7   1/1     Running   0          14s
+Srinivass-MacBook-Pro:deployments $ kubectl get rs
+NAME                          DESIRED   CURRENT   READY   AGE
+nginx-deployment-844c4b59f9   3         3         3       21s
+```
+
+![img_2.png](img_2.png)
+
+## scale 
+```plantuml
+$ kubectl scale --replicas=4 deployment/nginx-deployment
+```
+### Rollout
+Whenever there is change in the template section of Deployment configuration a new rollout is initiated by Kubernetes.
+This action ensures no impact on existing resources running inside and on client requests to them.
+K8s maintains last 10/configured value number of backups of replicas maintained and not deleted to rollback if needed.
+A new ReplicaSet is created along old ReplicaSet once all the 
+
+#### History of the rollouts 
+```plantuml
+$ kubectl rollout history deployment/nginx-deployment
+deployment.apps/nginx-deployment 
+REVISION  CHANGE-CAUSE
+1         <none>
+2         kubectl apply --filename=nginx-deployment.yaml --record=true
+```
+ 
+### Rollback
+Rollout to previous version or a specific revision in the history if it is available.
+```plantuml
+$ kubectl rollout undo deployment/nginx-deployment
+deployment.apps/nginx-deployment rolled back
+
+$ kubectl rollout undo deployment/nginx-deployment
+deployment.apps/nginx-deployment rolled back
+
+$ kubectl rollout undo deployment/nginx-deployment --to-revision=2
+deployment.apps/nginx-deployment rolled back
+
+$ kubectl rollout undo deployment/nginx-deployment --to-revision=3
+error: unable to find specified revision 3 in history
+
+```
+
+
+# Service SVC
+In Kubernetes, a Service is a method for exposing a network application that is running as one or more Pods in your cluster.
+The Service API, part of Kubernetes, is an abstraction to help you expose groups of Pods over a network. 
+Each Service object defines a logical set of endpoints (usually these endpoints are Pods) along with a policy about how to make those pods accessible.
+
+
+The Service abstraction enables this decoupling.
+
+```plantuml
+
+```
+```plantuml
+$ kubectl apply -f nginx-service.yaml 
+service/nginx-service created
+$ kubectl get svc
+NAME            TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE
+kubernetes      ClusterIP   10.96.0.1      <none>        443/TCP    11m
+nginx-service   ClusterIP   10.97.201.72   <none>        8082/TCP   12s
+```
+
+### Endpoint is not created when there is no match of labels of Pod and Service.
+With in POD unable to get ping with service IP.
+```
+$ kubectl get endpoints -A
+NAMESPACE              NAME                        ENDPOINTS                                     AGE
+default                kubernetes                  192.168.49.2:8443                             8m36s
+default                nginx-service               <none>                                        7m10s
+kube-system            k8s.io-minikube-hostpath    <none>                                        11h
+kube-system            kube-dns                    10.244.4.4:53,10.244.4.4:53,10.244.4.4:9153   11h
+kubernetes-dashboard   dashboard-metrics-scraper   10.244.4.5:8000                               9h
+kubernetes-dashboard   kubernetes-dashboard        10.244.4.6:9090                               9h
+```
+
+
+```
+$ kubectl get endpoints -A
+NAMESPACE              NAME                        ENDPOINTS                                     AGE
+default                kubernetes                  192.168.49.2:8443                             91s
+default                nginx-service               10.244.0.30:80,10.244.4.30:80                 64s
+kube-system            k8s.io-minikube-hostpath    <none>                                        11h
+kube-system            kube-dns                    10.244.4.4:53,10.244.4.4:53,10.244.4.4:9153   11h
+kubernetes-dashboard   dashboard-metrics-scraper   10.244.4.5:8000                               9h
+kubernetes-dashboard   kubernetes-dashboard        10.244.4.6:9090                               9h
+Srinivass-MacBook-Pro:deployments srinivasminigula$
+```
+
+#### Successfully got ping with IP and Port number with in the POD
+
+```plantuml
+$ kubectl exec -it nginx-deployment-844c4b59f9-hxxj4 -- sh
+# curl 10.110.86.202:8082
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+html { color-scheme: light dark; }
+body { width: 35em; margin: 0 auto;
+font-family: Tahoma, Verdana, Arial, sans-serif; }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+# 
+
+```
+# Ingress
+Ingress can provide load balancing, SSL termination, and name-based virtual hosting.
+

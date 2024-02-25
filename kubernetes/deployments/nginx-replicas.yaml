@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: nginx-replica-set
+  labels:
+    env: dev
+    team: backend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      env: dev
+      team: backend
+  template:
+      metadata:
+        name: nginx-pod
+        labels:
+          env: dev
+          team: backend
+          version: test
+      spec:
+        containers:
+          - name: nginx-deployment
+            image: nginx:latest
+            ports:
+              - containerPort: 80

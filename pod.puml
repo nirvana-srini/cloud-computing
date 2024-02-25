@@ -1,0 +1,34 @@
+@startuml
+
+node "Worker Node" {
+together {
+ frame POD1{
+ together {
+        rectangle "10.1.1.0" {
+            label "Container 2"
+            portout 8080
+            portin 8081
+        }
+        rectangle "10.1.1.1" {
+            label "Container 1"
+            port 8082
+        }
+        "10.1.1.0" --> "10.1.1.1" : localhost
+    }
+ }
+ frame POD2{
+    rectangle "10.1.1.2" {
+        label "Container 3"
+        portout 8084
+        portin 8085
+    }
+    rectangle "10.1.1.3" {
+        label "Container 4"
+        port 8086
+    }
+ }
+    POD1 -- POD2 : ipaddress
+}
+}
+
+@enduml

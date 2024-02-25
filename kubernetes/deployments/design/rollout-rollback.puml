@@ -1,0 +1,14 @@
+@startuml
+rectangle "deployment" {
+    rectangle "replicaset" {
+        rectangle pod {
+            agent Container2
+            agent Container1
+        }
+        rectangle pod2 {
+            agent Container3
+            agent Container4
+        }
+    }
+}
+@enduml
