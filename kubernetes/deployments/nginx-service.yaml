@@ -12,5 +12,5 @@ spec:
     version: test
   # type: ClusterIP # default value
   ports:
-    - port: 8082 # Service Port
+    - port: 8080 # Service Port
       targetPort: 80 # Application Container running port

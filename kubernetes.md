@@ -1,22 +1,131 @@
 https://www.markdownguide.org/basic-syntax/
 
-Kubernetes is Opensource
-Kubernetes is cloud container platform backed by Google.
+Kubernetes, also known as K8s, 
+- is an open-source system for 
+- automating deployment, 
+- scaling, and 
+- management of 
+containerized applications.
+
+Run K8s Anywhere
+Kubernetes is open source giving you the freedom to take advantage of 
+- on-premises, 
+- hybrid, or 
+- public cloud infrastructure, 
+letting you effortlessly move workloads to where it matters to you.
+
+Kubernetes is Opensource  
+Kubernetes is cloud container platform backed by Google now managed by [CNCF](cncf.io)
 Kubernetes is used for container orchestration when large number of container are deployed on a cluster.
 Kubernetes is Object based.
+
 Smallest fundamental operating unit in the kubernetes is Pod.
-Pod is group of containers(Container is an image with its runtime)
-Pod is configured as Deployment resource kind in Kubernetes.
+Pod is group of containers (Container is an image with its runtime)
+Pod is configured as POD resource kind in Kubernetes, Use this command to list all resources(```kubectl api-resources```).
 Deployment is model of the Pod, instance of Deployment is Pod actually sharing the resources of Node.
 Pod is Ephemeral, can be destroyed and created again using the Deployment config.
-Pod has a IP Address and port number to identify it in the Kubernetes network.
+Pod has a IP Address and various port numbers to identify it in the cluster network.
 # Kubernetes Architecture
 
+A Kubernetes cluster consists of a set of worker machines, called nodes, that run containerized applications. Every cluster has at least one worker node.
+```Control Plane Node is not worker node,but its comonents can run on worker nodes```
+
+The worker node(s) host the Pods that are the components of the application workload. The control plane manages the worker nodes and the Pods in the cluster. In production environments,
+the control plane usually runs across multiple computers and a cluster usually runs multiple nodes, providing fault-tolerance and high availability.
+
+## The API server 
+This is a component of the Kubernetes control plane that exposes the Kubernetes API. 
+The API server is the front end for the Kubernetes control plane.
+```Front End API Server```
+
+### etcd
+Consistent and highly-available key value store used as Kubernetes' backing store for all cluster data.
+```Stores all cluster data```
+
+### kube-scheduler
+Control plane component that watches for newly created Pods with no assigned node, and **selects a node** for them to run on.
+```Scheduler selects a node and assigns to Pod ```
+
+
+## Node Components
+Node components run on every node, maintaining running pods and providing the Kubernetes runtime environment.
+
+### kubelet -
+An agent that runs on each node in the cluster. It makes sure that containers are running in a Pod.
+
+The kubelet takes a set of PodSpecs that are provided through various mechanisms and ensures that the containers described in those PodSpecs are running and healthy. 
+The kubelet doesn't manage containers which were not created by Kubernetes.
+
+The Kubelet is an agent that runs on each **node** in the Kubernetes cluster and is responsible for managing containers and pods.
+Once the Scheduler has selected a node for the pod, the Kubelet on that node is responsible for 
+- pulling the necessary container images, 
+- creating the containers, and 
+- managing the pod's lifecycle.
+
+### kube-proxy or network-proxy or partialServiceImpl
+kube-proxy is a network proxy that runs on each node in your cluster, implementing part of the Kubernetes Service concept.
+
+kube-proxy maintains network rules on nodes. These network rules allow network communication to your Pods from network sessions inside or outside of your cluster.
+
+kube-proxy uses the operating system packet filtering layer if there is one and it's available. Otherwise, kube-proxy forwards the traffic itself.
+
+### Container runtime
+A fundamental component that empowers Kubernetes to run containers effectively. 
+It is responsible for managing the execution and lifecycle of containers within the Kubernetes environment.
+
+Kubernetes supports container runtimes such as containerd, CRI-O, and any other implementation of the Kubernetes CRI (Container Runtime Interface).
+
+### Kubelet:
+
+### kube-controller-manager
+**Control** plane component that runs **controller** processes.
+
+Logically, each controller is a separate process, but to reduce complexity, they are all compiled into a single binary and run in a single process.
+
+There are many different types of controllers. Some examples of them are:
+
+**Node controller**: Responsible for noticing and responding when nodes go down.
+**Job controller**: Watches for Job objects that represent one-off tasks, then creates Pods to run those tasks to completion.
+**EndpointSlice controller**: Populates EndpointSlice objects (to provide a link between Services and Pods).
+**ServiceAccount controller**: Create **default** ServiceAccounts for new namespaces.
+
+Control Plane is HA, LB, FT, FI and Low Latent instance scales horizontally by increasing the number of instances.
+Load balance the traffic load to different instances.
+
+![img_3.png](img_3.png)
+
 ![img.png](img.png)
+
+## Quiz:
+1) What is Kubernetes?
+2) What is node in kubernetes?
+3) What is Control Plane?
+4) Minimum requirements to run the Kubernetes?
+5) Components of Kubernetes
+6) Which component is in what node?
+7) Common node components
+8) Components specific to worker nodes?
+9) kubelet vs control manager?
+10) Who is responsible for keeping track of the state of the cluster and ensuring that all desired pods are scheduled?
+11) Does Kubernetes helps in containerized deployment by scaling, loading, balancing, and monitoring containers? True.
+12) Q3. How is Kubernetes related to Docker?
+    It’s a known fact that Docker provides the lifecycle management of containers and a Docker image builds the runtime containers. But, since these individual containers have to communicate, Kubernetes is used. So, Docker builds the containers and these containers communicate with each other via Kubernetes. So, containers running on multiple hosts can be manually linked and orchestrated using Kubernetes.
+13) | Features                      | Kubernetes                                                                                   | Docker Swarm                                                                        |
+    | ----------------------------- | -------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+    | Installation & Cluster Config | Setup is very complicated, but once installed cluster is robust.                             | Installation is very simple, but the cluster is not robust.                         |
+    | GUI                           | GUI is the [Kubernetes Dashboard](https://www.edureka.co/blog/kubernetes-dashboard/).        | There is no GUI.                                                                    |
+    | Scalability                   | Highly scalable and scales fast.                                                             | Highly scalable and scales 5x faster than Kubernetes.                               |
+    | Auto-scaling                  | Kubernetes can do auto-scaling.                                                              | Docker swarm cannot do auto-scaling.                                                |
+    | Load Balancing                | Manual intervention needed for load balancing traffic between different containers and pods. | Docker swarm does auto load balancing of traffic between containers in the cluster. |
+    | Rolling Updates & Rollbacks   | Can deploy rolling updates and does automatic rollbacks.                                     | Can deploy rolling updates, but not automatic rollback.                             |
+    | DATA Volumes                  | Can share storage volumes only with the other containers in the same pod.                    | Can share storage volumes with any other container.                                 |
+    | Logging & Monitoring          | In-built tools for logging and monitoring.                                                   | 3rd party tools like ELK stack should be used for logging and monitoring.           |
+Ref: https://www.edureka.co/blog/interview-questions/kubernetes-interview-questions/#four
+
 ## Setup of Kubernetes
  - Prerequisite
     Docker Container or Runtime is required to run the Kubernetes Cluster.
- - Docker is a container which is used to build, run and deply the applications on to cloud/k8s cluster.
+ - Docker is a container which is used to build, run and deploy the applications on to cloud/k8s cluster.
  - 
 ## Installation tools details
  https://kubernetes.io/docs/tasks/tools/
@@ -40,7 +149,7 @@ kubectl version --client --output=yaml
 ## Install Minikube
 
 minikube
-Like kind, minikube is a tool that lets you run Kubernetes locally. minikube runs an all-in-one or a multi-node local Kubernetes cluster on your personal computer (including Windows, macOS and Linux PCs) so that you can try out Kubernetes, or for daily development work.
+Like kind, minikube is a tool that lets you run Kubernetes locally. Minikube runs an all-in-one or a multi-node local Kubernetes cluster on your personal computer (including Windows, macOS and Linux PCs) so that you can try out Kubernetes, or for daily development work.
 
 What you’ll need
 2 CPUs or more
@@ -121,7 +230,7 @@ host: Running
 kubelet: Running
 ~~~
 
-## Kubectl - Kubernetes Cli client.
+## Kubectl - Kubernetes CLI client.
 
 Syntax of command 
 ```jshelllanguage
@@ -199,19 +308,19 @@ $ minikube node delete k8s-local-cluster-m03 -p k8s-local-cluster
 🔥  Deleting "k8s-local-cluster-m03" in docker ...
 
 ```
-# POD
+# POD Encapsulation of Containers
 What is a POD?
-POD is shell/case around the group of things. like Pea seeds.
+POD is shell/case around the group of things. like Pea shel for seeds.
 Pod is an encapsulated layer for of group or single container/s.
-Smallest deployable units of computation in the Kubernetes cluster. Runs on Worker nodes.
+Smallest deployable units of computation in the Kubernetes cluster. Runs on Worker nodes (??).
 Created and Managed by the kubelet.
 Pod is identified with dedicated unique IP Address and range of ports on its network.
 With in the POD containers shares same network and communicate with localhost.
 Containers belonging to different PODs use the IP Address to communicate with.
-
+![img_4.png](img_4.png)
 Pods are the smallest deployable units of computing that you can create and manage in Kubernetes.
 
-A Pod (as in a pod of whales or pea pod) is a group of one or more containers, 
+A Pod (as in a pod of whales or pea pod) is a one or group of containers, 
 with shared storage and network resources,
 and a specification for how to run the containers.
 
@@ -230,10 +339,10 @@ Main Container
 ### Sidecar Containers
 Sidecar containers are the secondary containers that run along with the main application container within the same Pod. 
 These containers are used to enhance or to extend the functionality of the main application container by providing additional services, 
-or functionality such as logging, monitoring, security, or data synchronization, without directly altering the primary application code.
+or functionality such as **logging**, **monitoring**, **security**, or **data synchronization**, without directly altering the primary application code.
 
 ### Create a POD
- Use kubectl run command
+ Use kubectl run command to create a pod and run it with a nginx container specified as an image.
  
 ```jshelllanguage
 $ kubectl run nginx-pod --image=ngnix
@@ -310,6 +419,9 @@ volumeattachments                              storage.k8s.io/v1                
 #### Create POD using yaml file config
 Create a Pod and get pod filter by labels.
 
+#### kubectl commands docs:
+https://jamesdefabia.github.io/docs/user-guide/kubectl/kubectl/
+
 ```jshelllanguage
 $ kubectl apply -f nginx-pod.yaml
 
@@ -322,7 +434,7 @@ READY 1/1 mean 1 container is running out of 1 defined.
 RESTARTS - As of now pod is not restarted at least once so 0.
 AGE - Aging of pod.
 IP - Network IP Address of the Pod. 
-Node - Worker node in which it is running.
+Node - Worker node in which it is running. can it be a control plane node??
 
 ##### Details of the POD
 ```jshelllanguage
@@ -339,12 +451,12 @@ $ kubectl describe pod nginx-pod-1
 Enter into bash shell of the Pod using the below command.
 ```jshelllanguage
 $ kubectl exec -it nginx-pod-1 -- bash
-$kubectl exec -it nginx-pod-1 -c nginx-deployment -- bash
+$ kubectl exec -it nginx-pod-1 -c nginx-deployment -- bash
 ```
 
 # Access POD 
 How to access POD.
-We can not directly access POD from outside of the node other wise from the host/cluster that it is running by doing port forwarding.
+We can not directly access POD from outside of the node other that the the host/cluster in which the POD is running by doing port forwarding.
 
 ## Port forwarding
 Post forwarding using kubectl.
@@ -482,7 +594,11 @@ REVISION  CHANGE-CAUSE
 1         <none>
 2         kubectl apply --filename=nginx-deployment.yaml --record=true
 ```
- 
+metadata:
+name: nginx-backend-deployment
+annotations:
+kubernetes.io/change-cause: "nginx version changed to alpine"
+
 ### Rollback
 Rollout to previous version or a specific revision in the history if it is available.
 ```plantuml
@@ -581,3 +697,85 @@ Commercial support is available at
 # Ingress
 Ingress can provide load balancing, SSL termination, and name-based virtual hosting.
 
+~~~
+**✨  Automatically selected the docker driver. Other choices: qemu2, ssh**
+When updating the existing cluster to change the driver
+✨  Using the docker driver based on existing profile
+
+~~~
+Ingress Controller is not available on Docker driver based Minikube
+
+https://minikube.sigs.k8s.io/docs/commands/delete/
+
+Delete all profiles and start the minikube again with VM true option to change the Driver from docker to Hyperkit
+
+```plantuml
+$ minikube addons enable ingress
+💡  ingress is an addon maintained by Kubernetes. For any concerns contact minikube on GitHub.
+You can view the list of minikube maintainers at: https://github.com/kubernetes/minikube/blob/master/OWNERS
+💡  After the addon is enabled, please run "minikube tunnel" and your ingress resources would be available at "127.0.0.1"
+    ▪ Using image registry.k8s.io/ingress-nginx/controller:v1.8.1
+    ▪ Using image registry.k8s.io/ingress-nginx/kube-webhook-certgen:v20230407
+    ▪ Using image registry.k8s.io/ingress-nginx/kube-webhook-certgen:v20230407
+🔎  Verifying ingress addon...
+🌟  The 'ingress' addon is enabled
+
+```
+
+```plantuml
+$ kubectl get pods -A
+
+$ kubectl get pods -A
+NAMESPACE       NAME                                        READY   STATUS      RESTARTS   AGE
+default         nginx-backend-deployment-6956db95f-6hcp6    1/1     Running     0          9m9s
+default         nginx-backend-deployment-6956db95f-ljvw2    1/1     Running     0          9m9s
+ingress-nginx   ingress-nginx-admission-create-vhqnw        0/1     Completed   0          26m
+ingress-nginx   ingress-nginx-admission-patch-pxndv         0/1     Completed   0          26m
+ingress-nginx   ingress-nginx-controller-7799c6795f-j2vw6   1/1     Running     0          26m
+kube-system     coredns-5d78c9869d-qk7nr                    1/1     Running     0          26m
+kube-system     etcd-minikube                               1/1     Running     0          27m
+kube-system     kube-apiserver-minikube                     1/1     Running     0          27m
+kube-system     kube-controller-manager-minikube            1/1     Running     0          27m
+kube-system     kube-proxy-9mlf6                            1/1     Running     0          26m
+kube-system     kube-scheduler-minikube                     1/1     Running     0          27m
+kube-system     storage-provisioner                         1/1     Running     0          26m
+
+```
+
+```plantuml
+$ kubectl config get-contexts
+$ minikube delete -p k8s-local-cluster
+🔥  Deleting "k8s-local-cluster" in docker ...
+🔥  Deleting container "k8s-local-cluster" ...
+🔥  Deleting container "k8s-local-cluster-m02" ...
+🔥  Removing /Users/srinivasminigula/.minikube/machines/k8s-local-cluster ...
+🔥  Removing /Users/srinivasminigula/.minikube/machines/k8s-local-cluster-m02 ...
+💀  Removed all traces of the "k8s-local-cluster" cluster.
+
+```
+
+```
+$ minikube start --driver=hyperkit --nodes 2 localcluster
+
+```
+
+vim /etc/hosts
+
+Toubleshooting 
+
+Ensure Pod status is running
+$ kubectl get pods -o wide
+
+Tail pod logs
+$ kubectl logs web-2136164036-ghs1p -f
+
+Every Kubernetes service is assigned a virtual IP and requests to that service will be proxied to one of its pods. This is important because your pod has to be running and has passed it’s healthchecks before it is added to the service.
+$ kubectl get service
+
+$ minikube start --vm=true --nodes 2 -p mycluster
+$ minikube addons enable ingress
+
+Finally it worked with this config on Mac.
+$ minikube start --driver=hyperkit --container-runtime=cri-o --cpus=2
+$ minikube addons enable ingress
+$ minikube node add --worker
